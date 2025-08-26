@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Поставщики{% endblock %}
+{% block content %}
+	<div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+		<h1>Поставщики</h1>
+		<a class="btn primary" href="/providers/new">Добавить</a>
+	</div>
+	<div class="card mt-3">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Название</th>
+					<th>URL шаблон</th>
+					<th>Метод</th>
+					<th>Статус</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for p in providers %}
+					<tr>
+						<td>{{ p.id }}</td>
+						<td>{{ p.name }}</td>
+						<td style="max-width:420px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.url_template }}</td>
+						<td>{{ p.method }}</td>
+						<td>
+							<span class="badge {{ 'on' if p.enabled else 'off' }}">{{ 'Включен' if p.enabled else 'Выключен' }}</span>
+						</td>
+						<td style="text-align:right;">
+							<a class="btn" href="/providers/{{ p.id }}/edit">Изменить</a>
+							<form method="post" action="/providers/{{ p.id }}/toggle" style="display:inline;">
+								<button class="btn" type="submit">Переключить</button>
+							</form>
+							<form method="post" action="/providers/{{ p.id }}/delete" style="display:inline;" onsubmit="return confirm('Удалить поставщика?');">
+								<button class="btn danger" type="submit">Удалить</button>
+							</form>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}

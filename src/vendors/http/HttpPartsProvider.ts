@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { PartsProvider, PartItem } from '../PartsProvider.js';
+import type { PartsProvider, PartItem } from '../PartsProvider.js';
 
 export class HttpPartsProvider implements PartsProvider {
 	private readonly baseUrl: string;
-	private readonly apiKey?: string;
+	private readonly apiKey: string | undefined;
 
 	constructor() {
 		this.baseUrl = process.env.API_BASE_URL || '';
-		this.apiKey = process.env.API_KEY;
+		this.apiKey = process.env.API_KEY || undefined;
 		if (!this.baseUrl) {
 			throw new Error('API_BASE_URL is required for http provider');
 		}
@@ -19,8 +19,8 @@ export class HttpPartsProvider implements PartsProvider {
 		if (this.apiKey) url.searchParams.set('api_key', this.apiKey);
 
 		const response = await axios.get(url.toString(), { timeout: 10000 });
-		// Expecting response data normalization. Adjust mapping as per actual API.
-		const items: PartItem[] = (response.data?.items || response.data?.results || []).map((row: any) => ({
+		const raw = (response.data?.items || response.data?.results || []) as any[];
+		const items: PartItem[] = raw.map((row: any) => ({
 			article: row.article || row.sku || row.partNumber || '',
 			name: row.name || row.title || '',
 			brand: row.brand || row.manufacturer,

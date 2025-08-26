@@ -1,4 +1,4 @@
-import { PartsProvider } from '../vendors/PartsProvider.js';
+import type { PartsProvider } from '../vendors/PartsProvider.js';
 import { HttpPartsProvider } from '../vendors/http/HttpPartsProvider.js';
 import { MockPartsProvider } from '../vendors/mock/MockPartsProvider.js';
 

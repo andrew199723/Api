@@ -1,4 +1,4 @@
-import { PartsProvider, PartItem } from '../PartsProvider.js';
+import type { PartsProvider, PartItem } from '../PartsProvider.js';
 
 const MOCK_DB: PartItem[] = [
 	{ article: '123-ABC', name: 'Фильтр масляный', brand: 'Bosch', price: 12.5, currency: 'USD', inStock: true },

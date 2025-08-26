@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Поиск запчастей по артикулу</title>
+	<style>
+		body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 20px; }
+		.container { max-width: 800px; margin: 0 auto; }
+		input { width: 100%; padding: 10px; font-size: 16px; }
+		button { padding: 10px 16px; font-size: 16px; margin-top: 8px; }
+		.card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin: 8px 0; }
+		.row { display: flex; gap: 8px; align-items: center; }
+		img { max-width: 64px; max-height: 64px; object-fit: contain; }
+		.small { color: #666; font-size: 12px; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h2>Поиск запчастей по артикулу</h2>
+		<input id="article" placeholder="Введите артикул (например, 123-ABC)" />
+		<button id="searchBtn">Найти</button>
+		<div id="status" class="small"></div>
+		<div id="results"></div>
+	</div>
+	<script type="module">
+		const input = document.getElementById('article');
+		const btn = document.getElementById('searchBtn');
+		const results = document.getElementById('results');
+		const statusEl = document.getElementById('status');
+
+		async function search() {
+			const article = input.value.trim();
+			if (!article) {
+				statusEl.textContent = 'Введите артикул';
+				return;
+			}
+			statusEl.textContent = 'Загрузка...';
+			results.innerHTML = '';
+			try {
+				const res = await fetch(`/api/parts?article=${encodeURIComponent(article)}`);
+				const data = await res.json();
+				statusEl.textContent = `Источник: ${data.source}, найдено: ${data.items.length}`;
+				for (const item of data.items) {
+					const div = document.createElement('div');
+					div.className = 'card';
+					div.innerHTML = `
+						<div class="row">
+							${item.imageUrl ? `<img src="${item.imageUrl}" alt="">` : ''}
+							<div>
+								<div><strong>${item.name || 'Без названия'}</strong></div>
+								<div class="small">Артикул: ${item.article}</div>
+								<div class="small">Бренд: ${item.brand || '-'}</div>
+								<div class="small">Цена: ${item.price ?? '-'} ${item.currency || ''}</div>
+								${item.url ? `<a href="${item.url}" target="_blank">Подробнее</a>` : ''}
+							</div>
+						</div>`;
+					results.appendChild(div);
+				}
+			} catch (e) {
+				console.error(e);
+				statusEl.textContent = 'Ошибка при запросе';
+			}
+		}
+
+		btn.addEventListener('click', search);
+		input.addEventListener('keydown', (e) => { if (e.key === 'Enter') search(); });
+	</script>
+</body>
+</html>
